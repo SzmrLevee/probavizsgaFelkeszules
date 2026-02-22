@@ -1,0 +1,221 @@
+openapi: 3.0.3
+info:
+  title: RiotSupportTracker API (Szomor Levente SZFT5)
+  version: 1.0.0
+  description: >
+    Egyszerű JSON REST API a Riot/LoL support jellegű ticketek és agentek kezelésére.
+servers:
+  - url: http://localhost
+    description: Local
+paths:
+  /api/tickets:
+    get:
+      summary: Ticketek listázása
+      responses:
+        '200':
+          description: Ticket lista
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketListResponse'
+    post:
+      summary: Új ticket létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketUpsert'
+      responses:
+        '201':
+          description: Létrehozott ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '422':
+          description: Validációs hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/tickets/{ticket}:
+    parameters:
+      - name: ticket
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Ticket lekérése azonosító alapján
+      responses:
+        '200':
+          description: Ticket adat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '404':
+          description: Nem található
+    put:
+      summary: Ticket módosítása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketUpsert'
+      responses:
+        '200':
+          description: Módosított ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '422':
+          description: Validációs hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Nem található
+    delete:
+      summary: Ticket törlése
+      responses:
+        '204':
+          description: Sikeres törlés
+        '404':
+          description: Nem található
+  /api/agents:
+    get:
+      summary: Agente(k) listázása
+      responses:
+        '200':
+          description: Agent lista
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentListResponse'
+  /api/agents/{agent}:
+    parameters:
+      - name: agent
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Agent lekérése azonosító alapján
+      responses:
+        '200':
+          description: Agent adat (ticketekkel)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '404':
+          description: Nem található
+components:
+  schemas:
+    Ticket:
+      type: object
+      required: [id, title, status, description]
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          maxLength: 100
+          example: "VAN 128 - Vanguard után nem indul a League"
+        status:
+          type: string
+          enum: [open, investigating, resolved, closed]
+          example: open
+        agent_id:
+          type: integer
+          nullable: true
+          example: 3
+        description:
+          type: string
+          maxLength: 2000
+          example: "A frissítés után a játék nem indul..."
+    Agent:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          maxLength: 50
+          example: "Zsófi \"Vanguard\" Tóth"
+    TicketUpsert:
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+          maxLength: 100
+        status:
+          type: string
+          enum: [open, investigating, resolved, closed]
+          nullable: true
+        agent_id:
+          type: integer
+          nullable: true
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+    TicketResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Ticket'
+    TicketListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+    AgentResponse:
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Agent'
+            - type: object
+              properties:
+                tickets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ticket'
+    AgentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Agent'
+              - type: object
+                properties:
+                  tickets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The given data was invalid."
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
