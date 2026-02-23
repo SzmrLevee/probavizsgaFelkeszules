@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="LolSupport/LolSupport.csproj" Id="95d0618d-36b3-41ff-b3af-427691f45b10" />
+  <Project Path="LoLSupportGUI/LoLSupportGUI.csproj" Id="381bf716-e43b-408f-b0bb-12d785acc001" />
   <Project Path="VizsgaLib/LolSupportLib.csproj" />
 </Solution>
