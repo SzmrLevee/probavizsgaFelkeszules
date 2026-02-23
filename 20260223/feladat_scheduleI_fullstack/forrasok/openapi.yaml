@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: ScheduleI Market API
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test
+paths:
+  /api/listings:
+    get:
+      summary: Listings listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingCollection'
+    post:
+      summary: Új listing létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+  /api/listings/{listing}:
+    get:
+      summary: Listing lekérése
+      parameters:
+        - in: path
+          name: listing
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+    put:
+      summary: Listing módosítása
+      parameters:
+        - in: path
+          name: listing
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingCreate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+    delete:
+      summary: Listing törlése
+      parameters:
+        - in: path
+          name: listing
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: No Content
+  /api/dealers:
+    get:
+      summary: Dealerek listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealerCollection'
+    post:
+      summary: Új dealer létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealerCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dealer'
+  /api/dealers/{dealer}:
+    get:
+      summary: Dealer lekérése
+      parameters:
+        - in: path
+          name: dealer
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dealer'
+    put:
+      summary: Dealer módosítása
+      parameters:
+        - in: path
+          name: dealer
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealerCreate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dealer'
+    delete:
+      summary: Dealer törlése
+      parameters:
+        - in: path
+          name: dealer
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    Dealer:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string, maxLength: 50 }
+        district: { type: string, maxLength: 40 }
+        commission: { type: integer, description: "Százalék" }
+      required: [id, name, district, commission]
+
+    DealerCreate:
+      type: object
+      properties:
+        name: { type: string, maxLength: 50 }
+        district: { type: string, maxLength: 40 }
+        commission: { type: integer }
+      required: [name, district, commission]
+
+    DealerCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Dealer' }
+      required: [data]
+
+    Listing:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string, maxLength: 100 }
+        status:
+          type: string
+          enum: [open, investigating, resolved, closed]
+        dealer_id:
+          type: integer
+          nullable: true
+        price: { type: integer }
+        quantity: { type: integer }
+        description: { type: string, maxLength: 2000 }
+      required: [id, title, status, price, quantity, description]
+
+    ListingCreate:
+      type: object
+      properties:
+        title: { type: string, maxLength: 100 }
+        status:
+          type: string
+          nullable: true
+          enum: [open, investigating, resolved, closed]
+          default: open
+        dealer_id:
+          type: integer
+          nullable: true
+        price: { type: integer }
+        quantity: { type: integer }
+        description: { type: string, maxLength: 2000 }
+      required: [title, price, quantity, description]
+
+    ListingCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Listing' }
+      required: [data]
