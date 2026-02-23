@@ -1,215 +1,221 @@
 openapi: 3.0.3
 info:
-  title: ScheduleI Market API
+  title: RiotSupportTracker API (Szomor Levente SZFT5)
   version: 1.0.0
+  description: >
+    Egyszerű JSON REST API a Riot/LoL support jellegű ticketek és agentek kezelésére.
 servers:
   - url: http://backend.vm1.test
+    description: Local
 paths:
-  /api/listings:
+  /api/tickets:
     get:
-      summary: Listings listázása
+      summary: Ticketek listázása
       responses:
         '200':
-          description: OK
+          description: Ticket lista
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListingCollection'
+                $ref: '#/components/schemas/TicketListResponse'
     post:
-      summary: Új listing létrehozása
+      summary: Új ticket létrehozása
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ListingCreate'
+              $ref: '#/components/schemas/TicketUpsert'
       responses:
         '201':
-          description: Created
+          description: Létrehozott ticket
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Listing'
-  /api/listings/{listing}:
+                $ref: '#/components/schemas/TicketResponse'
+        '422':
+          description: Validációs hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/tickets/{ticket}:
+    parameters:
+      - name: ticket
+        in: path
+        required: true
+        schema:
+          type: integer
     get:
-      summary: Listing lekérése
-      parameters:
-        - in: path
-          name: listing
-          required: true
-          schema: { type: integer }
+      summary: Ticket lekérése azonosító alapján
       responses:
         '200':
-          description: OK
+          description: Ticket adat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Listing'
+                $ref: '#/components/schemas/TicketResponse'
+        '404':
+          description: Nem található
     put:
-      summary: Listing módosítása
-      parameters:
-        - in: path
-          name: listing
-          required: true
-          schema: { type: integer }
+      summary: Ticket módosítása
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ListingCreate'
+              $ref: '#/components/schemas/TicketUpsert'
       responses:
         '200':
-          description: OK
+          description: Módosított ticket
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Listing'
+                $ref: '#/components/schemas/TicketResponse'
+        '422':
+          description: Validációs hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Nem található
     delete:
-      summary: Listing törlése
-      parameters:
-        - in: path
-          name: listing
-          required: true
-          schema: { type: integer }
+      summary: Ticket törlése
       responses:
         '204':
-          description: No Content
-  /api/dealers:
+          description: Sikeres törlés
+        '404':
+          description: Nem található
+  /api/agents:
     get:
-      summary: Dealerek listázása
+      summary: Agente(k) listázása
       responses:
         '200':
-          description: OK
+          description: Agent lista
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DealerCollection'
-    post:
-      summary: Új dealer létrehozása
-      requestBody:
+                $ref: '#/components/schemas/AgentListResponse'
+  /api/agents/{agent}:
+    parameters:
+      - name: agent
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DealerCreate'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Dealer'
-  /api/dealers/{dealer}:
+        schema:
+          type: integer
     get:
-      summary: Dealer lekérése
-      parameters:
-        - in: path
-          name: dealer
-          required: true
-          schema: { type: integer }
+      summary: Agent lekérése azonosító alapján
       responses:
         '200':
-          description: OK
+          description: Agent adat (ticketekkel)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dealer'
-    put:
-      summary: Dealer módosítása
-      parameters:
-        - in: path
-          name: dealer
-          required: true
-          schema: { type: integer }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DealerCreate'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Dealer'
-    delete:
-      summary: Dealer törlése
-      parameters:
-        - in: path
-          name: dealer
-          required: true
-          schema: { type: integer }
-      responses:
-        '204':
-          description: No Content
-
+                $ref: '#/components/schemas/AgentResponse'
+        '404':
+          description: Nem található
 components:
   schemas:
-    Dealer:
+    Ticket:
+      type: object
+      required: [id, title, status, description]
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          maxLength: 100
+          example: "VAN 128 - Vanguard után nem indul a League"
+        status:
+          type: string
+          enum: [open, investigating, resolved, closed]
+          example: open
+        agent_id:
+          type: integer
+          nullable: true
+          example: 3
+        description:
+          type: string
+          maxLength: 2000
+          example: "A frissítés után a játék nem indul..."
+    Agent:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          maxLength: 50
+          example: "Zsófi \"Vanguard\" Tóth"
+    TicketUpsert:
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+          maxLength: 100
+        status:
+          type: string
+          enum: [open, investigating, resolved, closed]
+          nullable: true
+        agent_id:
+          type: integer
+          nullable: true
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+    TicketResponse:
       type: object
       properties:
-        id: { type: integer }
-        name: { type: string, maxLength: 50 }
-        district: { type: string, maxLength: 40 }
-        commission: { type: integer, description: "Százalék" }
-      required: [id, name, district, commission]
-
-    DealerCreate:
-      type: object
-      properties:
-        name: { type: string, maxLength: 50 }
-        district: { type: string, maxLength: 40 }
-        commission: { type: integer }
-      required: [name, district, commission]
-
-    DealerCollection:
+        data:
+          $ref: '#/components/schemas/Ticket'
+    TicketListResponse:
       type: object
       properties:
         data:
           type: array
-          items: { $ref: '#/components/schemas/Dealer' }
-      required: [data]
-
-    Listing:
+          items:
+            $ref: '#/components/schemas/Ticket'
+    AgentResponse:
       type: object
       properties:
-        id: { type: integer }
-        title: { type: string, maxLength: 100 }
-        status:
-          type: string
-          enum: [open, investigating, resolved, closed]
-        dealer_id:
-          type: integer
-          nullable: true
-        price: { type: integer }
-        quantity: { type: integer }
-        description: { type: string, maxLength: 2000 }
-      required: [id, title, status, price, quantity, description]
-
-    ListingCreate:
-      type: object
-      properties:
-        title: { type: string, maxLength: 100 }
-        status:
-          type: string
-          nullable: true
-          enum: [open, investigating, resolved, closed]
-          default: open
-        dealer_id:
-          type: integer
-          nullable: true
-        price: { type: integer }
-        quantity: { type: integer }
-        description: { type: string, maxLength: 2000 }
-      required: [title, price, quantity, description]
-
-    ListingCollection:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Agent'
+            - type: object
+              properties:
+                tickets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ticket'
+    AgentListResponse:
       type: object
       properties:
         data:
           type: array
-          items: { $ref: '#/components/schemas/Listing' }
-      required: [data]
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Agent'
+              - type: object
+                properties:
+                  tickets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The given data was invalid."
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string

@@ -37,7 +37,7 @@ class TicketSeeder extends Seeder
             [
                 'title' => 'Hang bug - a játékban eltűnik a sfx, csak zene marad',
                 'status' => 'closed',
-                'agent_id' => None,
+                'agent_id' => null,
                 'description' => 'Meccs közben eltűnik minden effekt hang, csak a zene marad. Újraindítás segít, de visszatér. Végül a hangkártya driver újratelepítése megoldotta.',
             ],
             [
@@ -49,7 +49,7 @@ class TicketSeeder extends Seeder
         ];
 
         foreach ($tickets as $t) {
-            if ($t['agent_id'] === None) $t['agent_id'] = null;
+            if ($t['agent_id'] === null) $t['agent_id'] = null;
             Ticket::create($t);
         }
     }
