@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ScheduleCLI/ScheduleCLI.csproj" />
+  <Project Path="ScheduleGUI/ScheduleGUI.csproj" />
+  <Project Path="VizsgaLib/ScheduleLib.csproj" />
+</Solution>

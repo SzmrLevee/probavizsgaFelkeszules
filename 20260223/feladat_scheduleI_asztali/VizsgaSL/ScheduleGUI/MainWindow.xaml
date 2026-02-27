@@ -1,0 +1,48 @@
+﻿<Window x:Class="ScheduleGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScheduleGUI"
+        mc:Ignorable="d"
+        Title="Schedule I GUI" Height="450" Width="400">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0"
+                   Text="Dealerek"
+                   Margin="0,0,8,8"/>
+        <ComboBox Grid.Column="1" Grid.Row="0"
+                  ItemsSource="{Binding Dealerek}"
+                  SelectedItem="{Binding ValasztottDealer}"
+                  DisplayMemberPath="Nev"
+                  Margin="0,0,0,8"/>
+        <TextBlock Grid.Column="0" Grid.Row="1"
+           Text="Hirdetések"
+                   Margin="0,0,8,8"/>
+        <ComboBox Grid.Column="1" Grid.Row="1"
+          ItemsSource="{Binding AktivHirdetesek}"
+          SelectedItem="{Binding ValasztottHirdetes}"
+          DisplayMemberPath="Termek.Nev"
+          IsEnabled="{Binding VanDealer}"
+                  Margin="0,0,0,8"/>
+        <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="{x:Null}">
+            <StackPanel Margin="10">
+                <TextBlock Text="{Binding ValasztottHirdetes.Termek.Kategoria.Megnevezes, StringFormat=Kategória: {0}}"/>
+                <TextBlock Text="{Binding ValasztottHirdetes.Termek.ThcSzazalek, StringFormat=THC: {0}%}"/>
+                <TextBlock Text="{Binding ValasztottHirdetes.Ar, StringFormat=Ár: {0} Ft}"/>
+                <TextBlock Text="{Binding ValasztottHirdetes.Jutalek, StringFormat=Jutalék: {0} Ft}"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Window>
