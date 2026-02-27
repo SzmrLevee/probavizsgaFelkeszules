@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: HOI4 War Trade API – Szomor Levente SZFT5
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test/
+paths:
+  /api/factions:
+    get:
+      summary: Frakciók listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Faction' }
+    post:
+      summary: Új frakció létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FactionCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faction' }
+
+  /api/factions/{id}:
+    get:
+      summary: Frakció lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faction' }
+        '404': { description: Not found }
+    put:
+      summary: Frakció módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FactionUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faction' }
+        '404': { description: Not found }
+    delete:
+      summary: Frakció törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+  /api/trade-offers:
+    get:
+      summary: Kereskedelmi ajánlatok listázása (szűrhető)
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string, enum: [equipment, tank, intel, factory] }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TradeOffer' }
+    post:
+      summary: Új ajánlat létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TradeOfferCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TradeOffer' }
+        '422': { description: Validation error }
+
+  /api/trade-offers/{id}:
+    get:
+      summary: Ajánlat lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TradeOffer' }
+        '404': { description: Not found }
+    put:
+      summary: Ajánlat módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TradeOfferUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TradeOffer' }
+        '404': { description: Not found }
+        '422': { description: Validation error }
+    delete:
+      summary: Ajánlat törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+         schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+components:
+  schemas:
+    Faction:
+      type: object
+      required: [id, name, hq_city, rating]
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: "Szövetségesek" }
+        hq_city: { type: string, example: "London" }
+        rating: { type: integer, minimum: 1, maximum: 5, example: 5 }
+
+    FactionCreate:
+      type: object
+      required: [name, hq_city, rating]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 60 }
+        hq_city: { type: string, minLength: 2, maxLength: 40 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+
+    FactionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/FactionCreate'
+
+    TradeOffer:
+      type: object
+      required: [id, faction_id, category, title, tag, price, stock, is_active, listed_from]
+      properties:
+        id: { type: integer, example: 1 }
+        faction_id: { type: integer, example: 1 }
+        category: { type: string, enum: [equipment, tank, intel, factory] }
+        title: { type: string, example: "Gyalogsági felszerelés csomag" }
+        tag: { type: string, example: "INF" }
+        price: { type: integer, minimum: 1, example: 12000 }
+        stock: { type: integer, minimum: 0, example: 40 }
+        is_active: { type: boolean, example: true }
+        listed_from: { type: string, format: date, example: "1939-09-01" }
+        listed_to: { type: string, format: date, nullable: true, example: null }
+
+    TradeOfferCreate:
+      type: object
+      required: [faction_id, category, title, tag, price, stock, listed_from]
+      properties:
+        faction_id: { type: integer, minimum: 1 }
+        category: { type: string, enum: [equipment, tank, intel, factory] }
+        title: { type: string, minLength: 3, maxLength: 80 }
+        tag: { type: string, minLength: 2, maxLength: 20 }
+        price: { type: integer, minimum: 1 }
+        stock: { type: integer, minimum: 0 }
+        listed_from: { type: string, format: date }
+        listed_to: { type: string, format: date, nullable: true }
+        is_active: { type: boolean, nullable: true }
+
+    TradeOfferUpdate:
+      allOf:
+        - $ref: '#/components/schemas/TradeOfferCreate'

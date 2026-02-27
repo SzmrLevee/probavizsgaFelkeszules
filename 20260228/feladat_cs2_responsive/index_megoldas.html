@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS2 – Ajánlatok</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style>
+    @media (max-width: 575px){ body{ background-color:#eef2ff; } }
+  </style>
+</head>
+<body>
+  <main class="container my-3 mx-auto px-3">
+    <div class="mb-4">
+      <h1 class="text-[30px] text-center text-gray-900 font-semibold">CS2 – néhány kozmetikai ajánlat</h1>
+      <p class="text-center text-gray-600">Reszponzív kártyanézet (mobil → 4 sor, md → 2×2, xl → 1×4)</p>
+
+      <div class="mt-3 flex justify-center">
+        <div class="inline-flex gap-2">
+          <button class="px-4 py-2 rounded-full bg-gray-900 text-white hover:opacity-90">Összes</button>
+          <button class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200">Sticker</button>
+          <button class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200">Case</button>
+          <button class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200">Skin</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-rows-4 md:grid-rows-2 xl:grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="relative border bg-white hover:shadow-[0px_4px_6px_#111827]">
+        <span class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full bg-emerald-700 text-white">Új</span>
+        <div class="flex flex-col">
+          <img src="./images/sticker_sheet.png" alt="Sticker szett">
+          <div class="text-white bg-black text-center italic p-2 cursor-pointer hover:opacity-90" style="font-variant:small-caps; letter-spacing:2px;">Sticker capsule – 2026 Major</div>
+          <div class="p-2 flex justify-evenly">
+            <span class="bg-gray-900 text-white rounded-md p-2">5900 Ft</span>
+            <span class="bg-gray-200 rounded-md p-2 uppercase">MAJOR</span>
+            <span class="bg-gray-200 rounded-md p-2">Sticker</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative border bg-white hover:shadow-[0px_4px_6px_#111827]">
+        <span class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full bg-orange-700 text-white">Akció</span>
+        <div class="flex flex-col">
+          <img src="./images/skin_case.png" alt="Case drop">
+          <div class="text-white bg-black text-center italic p-2 cursor-pointer hover:opacity-90" style="font-variant:small-caps; letter-spacing:2px;">Case – Operation crate</div>
+          <div class="p-2 flex justify-evenly">
+            <span class="bg-gray-900 text-white rounded-md p-2">2100 Ft</span>
+            <span class="bg-gray-200 rounded-md p-2 uppercase">CASE</span>
+            <span class="bg-gray-200 rounded-md p-2">Case</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative border bg-white hover:shadow-[0px_4px_6px_#111827]">
+        <span class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full bg-sky-700 text-white">Top</span>
+        <div class="flex flex-col">
+          <img src="./images/rank_badge.png" alt="Rank jelvény">
+          <div class="text-white bg-black text-center italic p-2 cursor-pointer hover:opacity-90" style="font-variant:small-caps; letter-spacing:2px;">Gloves – Driver Gloves</div>
+          <div class="p-2 flex justify-evenly">
+            <span class="bg-gray-900 text-white rounded-md p-2">39900 Ft</span>
+            <span class="bg-gray-200 rounded-md p-2 uppercase">GLOVE</span>
+            <span class="bg-gray-200 rounded-md p-2">Glove</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative border bg-white hover:shadow-[0px_4px_6px_#111827]">
+        <span class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full bg-purple-700 text-white">Limitált</span>
+        <div class="flex flex-col">
+          <img src="./images/map_callout.png" alt="Map callout">
+          <div class="text-white bg-black text-center italic p-2 cursor-pointer hover:opacity-90" style="font-variant:small-caps; letter-spacing:2px;">Skin – Crimson Web</div>
+          <div class="p-2 flex justify-evenly">
+            <span class="bg-gray-900 text-white rounded-md p-2">129000 Ft</span>
+            <span class="bg-gray-200 rounded-md p-2 uppercase">KNIFE</span>
+            <span class="bg-gray-200 rounded-md p-2">Skin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-6 text-center text-gray-400">CS2 – demó oldal</footer>
+  </main>
+</body>
+</html>

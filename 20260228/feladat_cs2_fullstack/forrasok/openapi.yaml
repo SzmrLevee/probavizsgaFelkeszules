@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: CS2 Skin Market API – Szomor Levente SZFT5
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test/
+paths:
+  /api/traders:
+    get:
+      summary: Kereskedők listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Trader' }
+    post:
+      summary: Új kereskedő
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TraderCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Trader' }
+
+  /api/traders/{id}:
+    get:
+      summary: Kereskedő lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Trader' }
+        '404': { description: Not found }
+    put:
+      summary: Kereskedő módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TraderUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Trader' }
+        '404': { description: Not found }
+    delete:
+      summary: Kereskedő törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+  /api/skin-offers:
+    get:
+      summary: Ajánlatok listázása (szűrhető)
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string, enum: [skin, sticker, case, glove] }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SkinOffer' }
+    post:
+      summary: Új ajánlat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkinOfferCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SkinOffer' }
+        '422': { description: Validation error }
+
+  /api/skin-offers/{id}:
+    get:
+      summary: Ajánlat lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SkinOffer' }
+        '404': { description: Not found }
+    put:
+      summary: Ajánlat módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkinOfferUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SkinOffer' }
+        '404': { description: Not found }
+        '422': { description: Validation error }
+    delete:
+      summary: Ajánlat törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+components:
+  schemas:
+    Trader:
+      type: object
+      required: [id, name, city, rating]
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: "Dust2 Deals" }
+        city: { type: string, example: "Budapest" }
+        rating: { type: integer, minimum: 1, maximum: 5, example: 5 }
+
+    TraderCreate:
+      type: object
+      required: [name, city, rating]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 60 }
+        city: { type: string, minLength: 2, maxLength: 40 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+
+    TraderUpdate:
+      allOf:
+        - $ref: '#/components/schemas/TraderCreate'
+
+    SkinOffer:
+      type: object
+      required: [id, trader_id, category, title, tag, price, stock, is_active, listed_from]
+      properties:
+        id: { type: integer, example: 1 }
+        trader_id: { type: integer, example: 1 }
+        category: { type: string, enum: [skin, sticker, case, glove] }
+        title: { type: string, example: "Sticker capsule – 2026 Major" }
+        tag: { type: string, example: "MAJOR" }
+        price: { type: integer, minimum: 1, example: 5900 }
+        stock: { type: integer, minimum: 0, example: 40 }
+        is_active: { type: boolean, example: true }
+        listed_from: { type: string, format: date, example: "2026-02-10" }
+        listed_to: { type: string, format: date, nullable: true, example: null }
+
+    SkinOfferCreate:
+      type: object
+      required: [trader_id, category, title, tag, price, stock, listed_from]
+      properties:
+        trader_id: { type: integer, minimum: 1 }
+        category: { type: string, enum: [skin, sticker, case, glove] }
+        title: { type: string, minLength: 3, maxLength: 80 }
+        tag: { type: string, minLength: 2, maxLength: 20 }
+        price: { type: integer, minimum: 1 }
+        stock: { type: integer, minimum: 0 }
+        listed_from: { type: string, format: date }
+        listed_to: { type: string, format: date, nullable: true }
+        is_active: { type: boolean, nullable: true }
+
+    SkinOfferUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SkinOfferCreate'

@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: FIFA 2026 Fan Marketplace API – Szomor Levente SZFT5
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test/
+paths:
+  /api/vendors:
+    get:
+      summary: Eladók listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Vendor' }
+    post:
+      summary: Új eladó
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VendorCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Vendor' }
+
+  /api/vendors/{id}:
+    get:
+      summary: Eladó lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Vendor' }
+        '404': { description: Not found }
+    put:
+      summary: Eladó módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VendorUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Vendor' }
+        '404': { description: Not found }
+    delete:
+      summary: Eladó törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+  /api/listings:
+    get:
+      summary: Hirdetések listázása (szűrhető)
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string, enum: [jersey, scarf, ball, ticket] }
+        - in: query
+          name: team
+          schema: { type: string }
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Listing' }
+    post:
+      summary: Új hirdetés
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ListingCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Listing' }
+        '422': { description: Validation error }
+
+  /api/listings/{id}:
+    get:
+      summary: Hirdetés lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Listing' }
+        '404': { description: Not found }
+    put:
+      summary: Hirdetés módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ListingUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Listing' }
+        '404': { description: Not found }
+        '422': { description: Validation error }
+    delete:
+      summary: Hirdetés törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+components:
+  schemas:
+    Vendor:
+      type: object
+      required: [id, name, city, rating]
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: "Stadium Merch Hub" }
+        city: { type: string, example: "Dallas" }
+        rating: { type: integer, minimum: 1, maximum: 5, example: 5 }
+
+    VendorCreate:
+      type: object
+      required: [name, city, rating]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 60 }
+        city: { type: string, minLength: 2, maxLength: 40 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+
+    VendorUpdate:
+      allOf:
+        - $ref: '#/components/schemas/VendorCreate'
+
+    Listing:
+      type: object
+      required: [id, vendor_id, category, title, team, price, stock, is_active, listed_from]
+      properties:
+        id: { type: integer, example: 1 }
+        vendor_id: { type: integer, example: 1 }
+        category: { type: string, enum: [jersey, scarf, ball, ticket] }
+        title: { type: string, example: "2026 VB mez – Magyarország (M)" }
+        team: { type: string, example: "Magyarország" }
+        price: { type: integer, minimum: 1, example: 34900 }
+        stock: { type: integer, minimum: 0, example: 5 }
+        is_active: { type: boolean, example: true }
+        listed_from: { type: string, format: date, example: "2026-05-20" }
+        listed_to: { type: string, format: date, nullable: true, example: null }
+
+    ListingCreate:
+      type: object
+      required: [vendor_id, category, title, team, price, stock, listed_from]
+      properties:
+        vendor_id: { type: integer, minimum: 1 }
+        category: { type: string, enum: [jersey, scarf, ball, ticket] }
+        title: { type: string, minLength: 3, maxLength: 80 }
+        team: { type: string, minLength: 3, maxLength: 60 }
+        price: { type: integer, minimum: 1 }
+        stock: { type: integer, minimum: 0 }
+        listed_from: { type: string, format: date }
+        listed_to: { type: string, format: date, nullable: true }
+        is_active: { type: boolean, nullable: true }
+
+    ListingUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ListingCreate'

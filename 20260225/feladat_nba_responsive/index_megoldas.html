@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA relikviák</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <style>
+        @media (max-width: 575px) {
+            body { background-color: #f3efe4; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container my-3 mx-auto px-3">
+        <div class="mb-4">
+            <h1 class="text-[30px] text-center text-gray-900">NBA relikviák – néhány ajánlat</h1>
+            <p class="text-center text-gray-600">Reszponzív kártyanézet (mobil → 4 sor, tablet → 2×2, nagy kijelző → 1×4)</p>
+        </div>
+
+        <div class="grid grid-rows-4 md:grid-rows-2 xl:grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="border hover:shadow-[0px_4px_6px_#111827] bg-white">
+                <div class="flex flex-col">
+                    <img src="./images/arena.png" alt="Aréna poszter">
+                    <div class="text-white bg-black text-center italic p-2" style="font-variant:small-caps; letter-spacing: 2px;">Aréna poszter</div>
+                    <div class="p-2 flex justify-evenly">
+                        <span class="bg-gray-900 text-white rounded-md p-2">12000 Ft</span>
+                        <span class="bg-gray-200 rounded-md p-2 uppercase">Celtics</span>
+                        <span class="bg-gray-200 rounded-md p-2">2024</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border hover:shadow-[0px_4px_6px_#111827] bg-white">
+                <div class="flex flex-col">
+                    <img src="./images/jersey.png" alt="City Edition mez">
+                    <div class="text-white bg-black text-center italic p-2" style="font-variant:small-caps; letter-spacing: 2px;">City Edition mez</div>
+                    <div class="p-2 flex justify-evenly">
+                        <span class="bg-gray-900 text-white rounded-md p-2">32000 Ft</span>
+                        <span class="bg-gray-200 rounded-md p-2 uppercase">Lakers</span>
+                        <span class="bg-gray-200 rounded-md p-2">M</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border hover:shadow-[0px_4px_6px_#111827] bg-white">
+                <div class="flex flex-col">
+                    <img src="./images/ball.png" alt="Aláírt labda">
+                    <div class="text-white bg-black text-center italic p-2" style="font-variant:small-caps; letter-spacing: 2px;">Aláírt labda</div>
+                    <div class="p-2 flex justify-evenly">
+                        <span class="bg-gray-900 text-white rounded-md p-2">60000 Ft</span>
+                        <span class="bg-gray-200 rounded-md p-2 uppercase">Heat</span>
+                        <span class="bg-gray-200 rounded-md p-2">Hitelesített</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border hover:shadow-[0px_4px_6px_#111827] bg-white">
+                <div class="flex flex-col">
+                    <img src="./images/card.png" alt="Rookie kártya">
+                    <div class="text-white bg-black text-center italic p-2" style="font-variant:small-caps; letter-spacing: 2px;">Rookie kártya</div>
+                    <div class="p-2 flex justify-evenly">
+                        <span class="bg-gray-900 text-white rounded-md p-2">12000 Ft</span>
+                        <span class="bg-gray-200 rounded-md p-2 uppercase">Spurs</span>
+                        <span class="bg-gray-200 rounded-md p-2">Tokkal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

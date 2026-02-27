@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: "Szomor Levente SZFT5 – F1 Garage Marketplace API"
+  version: "1.0.0"
+servers:
+  - url: "http://backend.vm1.test/"
+paths:
+  /api/vendors:
+    get:
+      summary: "Vendors list"
+      responses:
+        "200":
+          description: "List of vendors"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorListResponse"
+    post:
+      summary: "Create vendor"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorCreate"
+      responses:
+        "201":
+          description: "Created vendor"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /api/vendors/{id}:
+    get:
+      summary: "Vendor details (with listings)"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: "Vendor details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorWithListingsResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: "Update vendor"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorUpdate"
+      responses:
+        "200":
+          description: "Updated vendor"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: "Delete vendor"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: "Deleted"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/listings:
+    get:
+      summary: "Listings list"
+      responses:
+        "200":
+          description: "List of listings"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingListResponse"
+    post:
+      summary: "Create listing"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListingCreate"
+      responses:
+        "201":
+          description: "Created listing"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/listings/{id}:
+    get:
+      summary: "Listing details"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: "Listing"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: "Update listing"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListingUpdate"
+      responses:
+        "200":
+          description: "Updated listing"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: "Delete listing"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: "Deleted"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
+  responses:
+    NotFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required: [message]
+    ValidationError:
+      description: "Validation error"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+            required: [message, errors]
+
+  schemas:
+    Vendor:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string, maxLength: 50 }
+        paddock_zone: { type: string, maxLength: 40 }
+        discount: { type: integer, description: "Percent (0-30)" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+      required: [id, name, paddock_zone, discount, created_at, updated_at]
+
+    Listing:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string, maxLength: 100 }
+        status:
+          type: string
+          enum: [open, negotiating, sold, archived]
+          default: open
+        vendor_id:
+          type: integer
+          nullable: true
+        price: { type: integer, minimum: 0 }
+        quantity: { type: integer, minimum: 0 }
+        description: { type: string, maxLength: 2000 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        vendor:
+          allOf:
+            - $ref: "#/components/schemas/Vendor"
+          nullable: true
+      required: [id, title, status, vendor_id, price, quantity, description, created_at, updated_at]
+
+    VendorCreate:
+      type: object
+      properties:
+        name: { type: string, maxLength: 50 }
+        paddock_zone: { type: string, maxLength: 40 }
+        discount: { type: integer, minimum: 0, maximum: 30 }
+      required: [name, paddock_zone, discount]
+
+    VendorUpdate:
+      type: object
+      properties:
+        name: { type: string, maxLength: 50 }
+        paddock_zone: { type: string, maxLength: 40 }
+        discount: { type: integer, minimum: 0, maximum: 30 }
+      required: [name, paddock_zone, discount]
+
+    ListingCreate:
+      type: object
+      properties:
+        title: { type: string, maxLength: 100 }
+        status:
+          type: string
+          enum: [open, negotiating, sold, archived]
+        vendor_id:
+          type: integer
+          nullable: true
+        price: { type: integer, minimum: 0 }
+        quantity: { type: integer, minimum: 0 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+      required: [title, price, quantity, description]
+
+    ListingUpdate:
+      type: object
+      properties:
+        title: { type: string, maxLength: 100 }
+        status:
+          type: string
+          enum: [open, negotiating, sold, archived]
+        vendor_id:
+          type: integer
+          nullable: true
+        price: { type: integer, minimum: 0 }
+        quantity: { type: integer, minimum: 0 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+      required: [title, status, vendor_id, price, quantity, description]
+
+    VendorResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Vendor"
+      required: [data]
+
+    VendorWithListings:
+      allOf:
+        - $ref: "#/components/schemas/Vendor"
+        - type: object
+          properties:
+            listings:
+              type: array
+              items: { $ref: "#/components/schemas/Listing" }
+          required: [listings]
+
+    VendorWithListingsResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/VendorWithListings"
+      required: [data]
+
+    VendorListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Vendor" }
+      required: [data]
+
+    ListingResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Listing"
+      required: [data]
+
+    ListingListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Listing" }
+      required: [data]
