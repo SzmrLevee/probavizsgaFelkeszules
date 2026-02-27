@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: F1 Garage Market API – Szomor Levente SZFT5
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test/
+paths:
+  /api/teams:
+    get:
+      summary: Csapatok listázása
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Team' }
+    post:
+      summary: Új csapat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TeamCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Team' }
+
+  /api/teams/{id}:
+    get:
+      summary: Csapat lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Team' }
+        '404': { description: Not found }
+    put:
+      summary: Csapat módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TeamUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Team' }
+        '404': { description: Not found }
+    delete:
+      summary: Csapat törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+  /api/garage-listings:
+    get:
+      summary: Garázs hirdetések listázása (szűrhető)
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string, enum: [aero, engine, tyre, gearbox] }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GarageListing' }
+    post:
+      summary: Új hirdetés
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GarageListingCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GarageListing' }
+        '422': { description: Validation error }
+
+  /api/garage-listings/{id}:
+    get:
+      summary: Hirdetés lekérése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GarageListing' }
+        '404': { description: Not found }
+    put:
+      summary: Hirdetés módosítása
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GarageListingUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GarageListing' }
+        '404': { description: Not found }
+        '422': { description: Validation error }
+    delete:
+      summary: Hirdetés törlése
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No content }
+        '404': { description: Not found }
+
+components:
+  schemas:
+    Team:
+      type: object
+      required: [id, name, base_city, rating]
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: "Red Falcon Racing" }
+        base_city: { type: string, example: "Milton Keynes" }
+        rating: { type: integer, minimum: 1, maximum: 5, example: 5 }
+
+    TeamCreate:
+      type: object
+      required: [name, base_city, rating]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 60 }
+        base_city: { type: string, minLength: 2, maxLength: 40 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+
+    TeamUpdate:
+      allOf:
+        - $ref: '#/components/schemas/TeamCreate'
+
+    GarageListing:
+      type: object
+      required: [id, team_id, category, title, tag, price, stock, is_active, listed_from]
+      properties:
+        id: { type: integer }
+        team_id: { type: integer }
+        category: { type: string, enum: [aero, engine, tyre, gearbox] }
+        title: { type: string }
+        tag: { type: string }
+        price: { type: integer, minimum: 1 }
+        stock: { type: integer, minimum: 0 }
+        is_active: { type: boolean }
+        listed_from: { type: string, format: date }
+        listed_to: { type: string, format: date, nullable: true }
+
+    GarageListingCreate:
+      type: object
+      required: [team_id, category, title, tag, price, stock, listed_from]
+      properties:
+        team_id: { type: integer, minimum: 1 }
+        category: { type: string, enum: [aero, engine, tyre, gearbox] }
+        title: { type: string, minLength: 3, maxLength: 80 }
+        tag: { type: string, minLength: 2, maxLength: 20 }
+        price: { type: integer, minimum: 1 }
+        stock: { type: integer, minimum: 0 }
+        listed_from: { type: string, format: date }
+        listed_to: { type: string, format: date, nullable: true }
+        is_active: { type: boolean, nullable: true }
+
+    GarageListingUpdate:
+      allOf:
+        - $ref: '#/components/schemas/GarageListingCreate'
